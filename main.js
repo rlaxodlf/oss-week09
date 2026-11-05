@@ -18,6 +18,8 @@ const CITIES = {
 };
 
 // P1 부터 여기 아래에 씁니다.
+import { getForecast } from './api.js';
+
 const form = document.getElementById('run-form');
 const citySelect = document.getElementById('city');
 const rainInput = document.getElementById('rain-limit');
@@ -26,16 +28,20 @@ const statusEl = document.getElementById('status');
 const summaryEl = document.getElementById('summary');
 const rowsEl = document.getElementById('rows');
 
-form.addEventListener('submit', function(event) {
-  // 1. 페이지가 새로 고쳐지지 않게 막는다.
+form.addEventListener('submit', async function(event) {
   event.preventDefault();
-
-  // 2. 도시 선택의 값으로 CITIES 에서 도시 객체를 꺼낸다.
   const city = CITIES[citySelect.value];
 
-  // 3. 상태 줄에 Loading... 을 쓴다.
+  statusEl.classList.remove('error');
   statusEl.textContent = 'Loading...';
 
-  // 4. 꺼낸 도시 객체를 console.log 로 찍는다.
-  console.log(city);
+  try {
+    const daily = await getForecast({ lat: city.lat, lon: city.lon });
+    
+    statusEl.textContent = '';
+    console.log(daily);
+  } catch (error) {
+    statusEl.textContent = `Could not load the forecast (${error.message}).`;
+    statusEl.classList.add('error');
+  }
 });
