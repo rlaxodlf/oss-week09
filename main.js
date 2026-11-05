@@ -98,3 +98,15 @@ function render() {
     summaryEl.textContent = '';
   }
 }
+
+function onLimitsInput() {
+  state.limits = {
+    rain: Number(rainInput.value),
+    wind: Number(windInput.value),
+  };
+  render();
+}
+
+[rainInput, windInput].forEach(function (input) {
+  input.addEventListener('input', onLimitsInput);
+});
