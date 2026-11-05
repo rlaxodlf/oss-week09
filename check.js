@@ -1,4 +1,4 @@
-import { toDays, isGoodDay, summarize } from "./logic.js";
+import { toDays, isGoodDay, summarize, reasons } from "./logic.js";
 
 const daily = {
   time: ["11-21", "11-22", "11-23", "11-24"],
@@ -17,3 +17,8 @@ console.log(isGoodDay(days[2], limits));
 console.log(isGoodDay(days[3], limits));
 console.log(summarize(days, limits));
 console.log(summarize([], limits));
+console.log(reasons(days[0], limits));
+console.log(reasons(days[1], limits));
+console.log(reasons(days[2], limits));
+console.log(reasons(days[3], limits));
+console.log(reasons({ date: "11-25", max: 8, wind: 11.2, rain: 57 }, limits));
