@@ -19,13 +19,7 @@ const CITIES = {
 
 // P1 부터 여기 아래에 씁니다.
 import { getForecast } from './api.js';
-import { toDays } from "./logic.js"; 
-
-// state는 전역 변수
-const state = {
-  city: null,
-  days: []
-};
+import { toDays, isGoodDay, summarize } from "./logic.js";
 
 const form = document.getElementById('run-form');
 const citySelect = document.getElementById('city');
@@ -34,6 +28,13 @@ const windInput = document.getElementById('wind-limit');
 const statusEl = document.getElementById('status');
 const summaryEl = document.getElementById('summary');
 const rowsEl = document.getElementById('rows');
+
+// state는 전역 변수
+const state = {
+  city: null,
+  days: [],
+  limits: { rain: Number(rainInput.value), wind: Number(windInput.value) },
+};
 
 form.addEventListener('submit', async function(event) {
   event.preventDefault();
@@ -48,6 +49,10 @@ form.addEventListener('submit', async function(event) {
     // 받아온 데이터를 state에 저장합니다.
     state.city = city;
     state.days = toDays(daily);
+    state.limits = {
+      rain: Number(rainInput.value),
+      wind: Number(windInput.value)
+    };
     statusEl.textContent = '';
   } catch (error) {
     statusEl.textContent = `Could not load the forecast (${error.message}).`;
@@ -77,9 +82,19 @@ function dayRow(day) {
   tdRain.textContent = day.rain + '%';
   tr.appendChild(tdRain);
 
+  if (isGoodDay(day, state.limits)) {
+    tr.classList.add('good');
+  }
+
   return tr;
 }
 
 function render() {
   rowsEl.replaceChildren(...state.days.map(dayRow));
+
+  if (state.city !== null) {
+    summaryEl.textContent = `${state.city.name}: ${summarize(state.days, state.limits)}.`;
+  } else {
+    summaryEl.textContent = '';
+  }
 }
