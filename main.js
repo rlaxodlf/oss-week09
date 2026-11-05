@@ -19,6 +19,13 @@ const CITIES = {
 
 // P1 부터 여기 아래에 씁니다.
 import { getForecast } from './api.js';
+import { toDays } from "./logic.js"; 
+
+// state는 전역 변수
+const state = {
+  city: null,
+  days: []
+};
 
 const form = document.getElementById('run-form');
 const citySelect = document.getElementById('city');
@@ -38,10 +45,41 @@ form.addEventListener('submit', async function(event) {
   try {
     const daily = await getForecast({ lat: city.lat, lon: city.lon });
     
+    // 받아온 데이터를 state에 저장합니다.
+    state.city = city;
+    state.days = toDays(daily);
     statusEl.textContent = '';
-    console.log(daily);
   } catch (error) {
     statusEl.textContent = `Could not load the forecast (${error.message}).`;
     statusEl.classList.add('error');
   }
+
+  // 성공이든 실패든 무조건 마지막에 화면을 그립니다.
+  render();
 });
+
+function dayRow(day) {
+  const tr = document.createElement('tr');
+
+  const tdDate = document.createElement('td');
+  tdDate.textContent = day.date.substring(5);
+  tr.appendChild(tdDate);
+
+  const tdMax = document.createElement('td');
+  tdMax.textContent = day.max + '°';
+  tr.appendChild(tdMax);
+
+  const tdWind = document.createElement('td');
+  tdWind.textContent = day.wind + ' km/h';
+  tr.appendChild(tdWind);
+
+  const tdRain = document.createElement('td');
+  tdRain.textContent = day.rain + '%';
+  tr.appendChild(tdRain);
+
+  return tr;
+}
+
+function render() {
+  rowsEl.replaceChildren(...state.days.map(dayRow));
+}
